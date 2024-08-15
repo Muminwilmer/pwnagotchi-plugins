@@ -29,7 +29,7 @@ class Polisen(plugins.Plugin):
     def on_loaded(self):
         self.news = None
         logging.info("[Polisen] loaded!")
-        self.polisen(self)
+        self.polisen()
 
     def on_ui_setup(self, ui):
         try:
@@ -115,7 +115,7 @@ class Polisen(plugins.Plugin):
     
     def on_epoch(self, agent):
         logging.info("[Polisen] New epoch!")
-        self.polisen(self)
+        self.polisen()
 
     def polisen(self):
         try:
