@@ -10,10 +10,22 @@ import re
 
 class Polisen(plugins.Plugin):
     __author__ = '@Muminwilmer'
-    __version__ = '1.0.0'
+    __version__ = '1.0.1'
     __license__ = 'GPL3'
     __description__ = 'Displays the latest event from the Swedish police offical API.'
 
+    # EXAMPLE RESPONSE ->
+    # "id": 542272,
+    # "datetime": "2024-08-15 17:47:48 +02:00",
+    # "name": "15 augusti 16.55, Bråk, Västerås",   -   (Used for time: 16.55)
+    # "summary": "Samtal om pågående bråk.",
+    # "url": "/aktuellt/handelser/2024/augusti/15/15-augusti-16.55-brak-vasteras/",
+    # "type": "Bråk",   -   (Used for type: Bråk)
+    # "location": {
+    #     "name": "Västerås",   -   (Used for location: Västerås)
+    #     "gps": "59.609901,16.544809"
+    # }
+    
     def on_loaded(self):
         self.news = None
         logging.info("[Polisen] loaded!")
@@ -21,11 +33,12 @@ class Polisen(plugins.Plugin):
 
     def on_ui_setup(self, ui):
         try:
-            logging.info("[Polisen] UI setup.")
             self._ui = ui
             # Set default position based on screen type
             # 0, 98 - Bottom left
             # 74, 112 - Bottom Row Middle
+
+            # Use position set in options.
             if 'x-position' & 'y-position' in self.options:
                 position = (
                     self.options["x-position"], 
@@ -44,14 +57,14 @@ class Polisen(plugins.Plugin):
             else:
                 position = (0, 98)
 
+            ## If x & y isn't in options : add it.
             if 'x-position' & 'y-position' not in self.options:
                 x = position[0]
                 y = position[1]
                 self.options['x-position'] = x
                 self.options['y-position'] = y
 
-            logging.info("[Polisen] Creating UI element.", position)
-
+            
             if self.options['orientation'] == "vertical":
                 ui.add_element(
                     'polisen-ui', 
@@ -104,21 +117,23 @@ class Polisen(plugins.Plugin):
 
     def polisen(self):
         try:
-            logging.info(f"[Polisen] Fetching news")
             response = requests.get("https://polisen.se/api/events", timeout=10)
             response.raise_for_status()
-            logging.info(f"[Polisen] Status Code: {response.status_code}")
 
-            # Check if the request was successful
             if response.status_code == 200:
                 data = response.json()
                 if data:
-                    date_match = re.search(r"([0-9]+:[0-9]+):[0-9]+", data[0].get('datetime', ''))
+                    # Regex the time from the name
+                    date_match = re.search(r"([0-9]+.[0-9]+)", data[0].get('name', ''))
                     date = date_match.group(1) if date_match else 'Unknown time'
+                    
+                    # Get the location
                     location = data[0].get('location', {}).get('name', 'Unknown')
+                    
+                    # Get the type of event
                     event_type = data[0].get('type', 'Unknown')
                     
-                    self.news = f"{location} - {event_type} ({date})"
+                    self.news = f"{event_type} - {location} ({date})"
                     logging.info(f"[Polisen] Fetched news: {self.news}")
             else:
                 logging.error("[Polisen] Failed to fetch data.")
