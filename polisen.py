@@ -119,6 +119,7 @@ class Polisen(plugins.Plugin):
 
     def polisen(self):
         try:
+            logging.info(f"[Polisen] Fetching news!")
             response = requests.get("https://polisen.se/api/events", timeout=10)
             response.raise_for_status()
 
@@ -137,6 +138,8 @@ class Polisen(plugins.Plugin):
                     
                     self.news = f"{event_type} - {location} ({date})"
                     logging.info(f"[Polisen] Fetched news: {self.news}")
+                else:
+                    logging.error("erm what, no data".)
             else:
                 logging.error("[Polisen] Failed to fetch data.")
 
