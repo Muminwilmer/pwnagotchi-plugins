@@ -29,7 +29,6 @@ class Polisen(plugins.Plugin):
     def on_loaded(self):
         self.news = None
         logging.info("[Polisen] loaded!")
-        self.polisen()
 
     def on_ui_setup(self, ui):
         try:
@@ -91,6 +90,7 @@ class Polisen(plugins.Plugin):
                     )
                 )
             logging.info("[Polisen] Created UI element.")
+            self.polisen()
         except Exception as e:
             logging.error(f"[Polisen] An error has occurred when creating the UI: {str(e)}")
 
