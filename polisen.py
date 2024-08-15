@@ -39,7 +39,7 @@ class Polisen(plugins.Plugin):
             # 74, 112 - Bottom Row Middle
 
             # Use position set in options.
-            if 'x-position' & 'y-position' in self.options:
+            if 'x-position' in self.options and 'y-position' in self.options:
                 position = (
                     self.options["x-position"], 
                     self.options["y-position"]
@@ -58,7 +58,7 @@ class Polisen(plugins.Plugin):
                 position = (0, 98)
 
             ## If x & y isn't in options : add it.
-            if 'x-position' & 'y-position' not in self.options:
+            if 'x-position' not in self.options and 'y-position' not in self.options:
                 x = position[0]
                 y = position[1]
                 self.options['x-position'] = x
