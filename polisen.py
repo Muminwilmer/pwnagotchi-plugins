@@ -139,7 +139,7 @@ class Polisen(plugins.Plugin):
                     self.news = f"{event_type} - {location} ({date})"
                     logging.info(f"[Polisen] Fetched news: {self.news}")
                 else:
-                    logging.error("erm what, no data".)
+                    logging.error("[Polisen] erm what, no data.")
             else:
                 logging.error("[Polisen] Failed to fetch data.")
 
