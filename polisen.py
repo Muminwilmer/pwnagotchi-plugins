@@ -44,18 +44,19 @@ class Polisen(plugins.Plugin):
                     self.options["x-position"], 
                     self.options["y-position"]
                 )
-            if ui.is_waveshare_v1():
-                position = (0, 98)
-            elif ui.is_waveshare_v2():
-                position = (0, 98)
-            elif ui.is_waveshare_v3():
-                position = (0, 98)
-            elif ui.is_waveshare144lcd():
-                position = (0, 92)
-            elif ui.is_inky():
-                position = (0, 83)
             else:
-                position = (0, 98)
+                if ui.is_waveshare_v1():
+                    position = (0, 98)
+                elif ui.is_waveshare_v2():
+                    position = (0, 98)
+                elif ui.is_waveshare_v3():
+                    position = (0, 98)
+                elif ui.is_waveshare144lcd():
+                    position = (0, 92)
+                elif ui.is_inky():
+                    position = (0, 83)
+                else:
+                    position = (0, 98)
 
             ## If x & y isn't in options : add it.
             if 'x-position' not in self.options and 'y-position' not in self.options:
