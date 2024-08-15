@@ -117,7 +117,7 @@ class Polisen(plugins.Plugin):
         logging.info("[Polisen] New epoch!")
         self.polisen()
 
-    def polisen():
+    def polisen(self):
         try:
             logging.info(f"[Polisen] Fetching news!")
             response = requests.get("https://polisen.se/api/events", timeout=10)
