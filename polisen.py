@@ -113,7 +113,7 @@ class Polisen(plugins.Plugin):
             logging.info("[Polisen] ui has been updated!", self.news)
             self.news = ""
     
-    def on_epoch(self, agent):
+    def on_epoch(self, agent, epoch, epoch_data):
         logging.info("[Polisen] New epoch!")
         self.polisen()
 
