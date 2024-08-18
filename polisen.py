@@ -161,15 +161,14 @@ class Polisen(plugins.Plugin):
                             name_str = event.get('name', '')
 
                             # Extracting date from the name, e.g., "15 augusti 16.55"
-                            date_match = re.search(r"(\S+) (\S+) (\S+)", name_str)
-                            day = date_match.group(1)
-                            month = date_match.group(2)
-                            time = date_match.group(3)
+                            date_match = re.search(r"(\S+) (\S+) (\d+\.\d+)", name_str)   
                             if date_match:
+                                day = date_match.group(1)
+                                month = date_match.group(2)
+                                time = date_match.group(3)
                                 date_time = f"{day} {month_translation.get(month.lower())} {time}"
                                 # Parsing string into a datetime object
                                 event_time = datetime.strptime(date_time, "%d %B %H.%M")
-                                logging.info(date_time)
                                 # If latest time is smaller than the event time | make the event time the latest
                                 if latest_time is None or event_time > latest_time:
                                     latest_time = event_time
