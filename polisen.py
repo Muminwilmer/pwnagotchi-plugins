@@ -95,7 +95,7 @@ class Polisen(plugins.Plugin):
                 ui.set('polisen-ui', self.news)
                 ui.set('status', self.news)
                 ui.set('face', "(^-^)")
-                logging.info("[Polisen] ui has been updated!", self.news)
+                logging.info("[Polisen] ui has been updated!")
                 self.news = ""
             elif not self.connection and self.options['onlyOnInternet']:
                 ui.set('polisen-ui', "No wifi")
