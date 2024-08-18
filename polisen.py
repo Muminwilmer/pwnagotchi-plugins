@@ -177,7 +177,7 @@ class Polisen(plugins.Plugin):
                     if latest_event:
                         location = latest_event.get('location', {}).get('name', 'Unknown')
                         event_type = latest_event.get('type', 'Unknown')
-                        event_time_str = re.search(r"([0-9]+.[0-9]+)", latest_event.get('name', 'Unknown'))
+                        event_time_str = re.search(r"([0-9]+.[0-9]+)", latest_event.get('name', 'Unknown')).group(1)
                         self.news = f"{event_type[slice(12)]} - {location[slice(15)]} ({event_time_str})"
                         logging.info(f"[Polisen] Fetched news: {self.news}")
         except requests.RequestException as e:
