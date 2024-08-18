@@ -142,15 +142,16 @@ class Polisen(plugins.Plugin):
                     latest_time = None
 
                     if self.options['newestEventTop'] == True:
+                        locale.setlocale(locale.LC_TIME, 'sv_SE')
                         for event in data:
                             # Name example: 15 augusti 16.55, Bråk, Västerås
                             name_str = event.get('name', '')
 
-                            # Extracting the date from the name, e.g., "15 augusti 16.55"
+                            # Extracting date from the name, e.g., "15 augusti 16.55"
                             date_match = re.search(r"([0-9]+ [a-zA-Z]+ [0-9]{2}\.[0-9]{2})", name_str)
                             if date_match:
                                 date_time = date_match.group(1)
-                                # Parsing the string into a datetime object
+                                # Parsing string into a datetime object
                                 event_time = datetime.strptime(date_time, "%d %B %H.%M")
 
                                 # If latest time is smaller than the event time | make the event time the latest
