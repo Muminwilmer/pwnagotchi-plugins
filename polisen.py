@@ -165,7 +165,6 @@ class Polisen(plugins.Plugin):
                             day = date_match.group(1)
                             month = date_match.group(2)
                             time = date_match.group(3)
-                            month_match
                             if date_match:
                                 date_time = f"{day} {month_translation.get(month.lower())} {time}"
                                 # Parsing string into a datetime object
