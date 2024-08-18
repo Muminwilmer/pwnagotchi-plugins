@@ -38,7 +38,7 @@ class Polisen(plugins.Plugin):
         try:
             self._ui = ui
             # Set default position based on screen type
-            # 0, 98 - Bottom left
+            # -4, 98 - Bottom left
             # 74, 112 - Bottom Row Middle
 
             # Use position set in options.
@@ -46,13 +46,13 @@ class Polisen(plugins.Plugin):
                 position = (self.options["x-position"], self.options["y-position"])
             else:
                 if ui.is_waveshare_v1() or ui.is_waveshare_v2() or ui.is_waveshare_v3():
-                    position = (0, 98)
+                    position = (-4, 98)
                 elif ui.is_waveshare144lcd():
-                    position = (0, 92)
+                    position = (-4, 92)
                 elif ui.is_inky():
-                    position = (0, 83)
+                    position = (-4, 83)
                 else:
-                    position = (0, 98)
+                    position = (-4, 98)
                 self.options['x-position'], self.options['y-position'] = position
 
             # Add the UI element
@@ -157,7 +157,7 @@ class Polisen(plugins.Plugin):
                             "december": "December"
                         }
                         for event in data:
-                            # Name example: 15 augusti 16.55, Bråk, Västerås
+                            # Name example: 15 augusti 16.55, Br�k, V�ster�s
                             name_str = event.get('name', '')
 
                             # Extracting date from the name, e.g., "15 augusti 16.55"
