@@ -12,7 +12,7 @@ import locale
 
 class Polisen(plugins.Plugin):
     __author__ = '@Muminwilmer'
-    __version__ = '1.1.1'
+    __version__ = '1.2.0'
     __license__ = 'GPL3'
     __description__ = 'Displays the latest event from the Swedish police offical API.'
     
