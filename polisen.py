@@ -6,6 +6,8 @@ import pwnagotchi
 import logging
 import requests
 import re
+from datetime import datetime
+import locale
 
 
 class Polisen(plugins.Plugin):
@@ -13,26 +15,19 @@ class Polisen(plugins.Plugin):
     __version__ = '1.1.1'
     __license__ = 'GPL3'
     __description__ = 'Displays the latest event from the Swedish police offical API.'
-
-    # EXAMPLE RESPONSE ->
-    # "id": 542272,
-    # "datetime": "2024-08-15 17:47:48 +02:00",
-    # "name": "15 augusti 16.55, Bråk, Västerås",   -   (Used for time: 16.55)
-    # "summary": "Samtal om pågående bråk.",
-    # "url": "/aktuellt/handelser/2024/augusti/15/15-augusti-16.55-brak-vasteras/",
-    # "type": "Bråk",   -   (Used for type: Bråk)
-    # "location": {
-    #     "name": "Västerås",   -   (Used for location: Västerås)
-    #     "gps": "59.609901,16.544809"
-    # }
     
     def on_loaded(self):
         self.news = None
         self.connection = False
+        # Amount of epochs between update attempts
         if 'epoch-wait' not in self.options:
             self.options['epoch-wait'] = 0
+        # Only try to update while on wifi
         if 'onlyOnInternet' not in self.options:
             self.options['onlyOnInternet'] = True
+        # If true it will show the latest new event. If false it will show latest update/new event
+        if 'newestEventTop' not in self.options:
+            self.options['newestEventTop'] = True
         self.epochsWaited = 0
         logging.info("[Polisen] loaded!")
 
@@ -102,6 +97,8 @@ class Polisen(plugins.Plugin):
                 ui.set('face', "(^-^)")
                 logging.info("[Polisen] ui has been updated!", self.news)
                 self.news = ""
+            elif not self.connection and self.options['onlyOnInternet']:
+                ui.set('polisen-ui', "No wifi")
         except Exception as e:
             logging.error(f"[Polisen] Failed to update UI: {e}")
 
@@ -141,12 +138,32 @@ class Polisen(plugins.Plugin):
             if response.status_code == 200:
                 data = response.json()
                 if data:
-                    date_match = re.search(r"([0-9]+.[0-9]+)", data[0].get('name', ''))
-                    date = date_match.group(1) if date_match else 'Unknown time'
-                    location = data[0].get('location', {}).get('name', 'Unknown')
-                    event_type = data[0].get('type', 'Unknown')
-                    self.news = f"{event_type} - {location} ({date})"
-                    logging.info(f"[Polisen] Fetched news: {self.news}")
+                    latest_event = data[0]
+                    latest_time = None
+
+                    if self.options['newestEventTop'] == True:
+                        for event in data:
+                            # Name example: 15 augusti 16.55, Bråk, Västerås
+                            name_str = event.get('name', '')
+
+                            # Extracting the date from the name, e.g., "15 augusti 16.55"
+                            date_match = re.search(r"([0-9]+ [a-zA-Z]+ [0-9]{2}\.[0-9]{2})", name_str)
+                            if date_match:
+                                date_time = date_match.group(1)
+                                # Parsing the string into a datetime object
+                                event_time = datetime.strptime(date_time, "%d %B %H.%M")
+
+                                # If latest time is smaller than the event time | make the event time the latest
+                                if latest_time is None or event_time > latest_time:
+                                    latest_time = event_time
+                                    latest_event = event
+
+                    if latest_event:
+                        location = latest_event.get('location', {}).get('name', 'Unknown')
+                        event_type = latest_event.get('type', 'Unknown')
+                        event_time_str = re.search(r"([0-9]+.[0-9]+)", latest_event.get('name', 'Unknown'))
+                        self.news = f"{event_type[slice(12)]} - {location[slice(15)]} ({event_time_str})"
+                        logging.info(f"[Polisen] Fetched news: {self.news}")
         except requests.RequestException as e:
             logging.error(f"[Polisen] Data fetch failed: {e}")
         except Exception as e:
