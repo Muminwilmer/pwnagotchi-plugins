@@ -157,7 +157,7 @@ class Polisen(plugins.Plugin):
                             "december": "December"
                         }
                         for event in data:
-                            # Name example: 15 augusti 16.55, Br�k, V�ster�s
+                            # Name example: 15 augusti 16.55, Bråk, Västerås
                             name_str = event.get('name', '')
 
                             # Extracting date from the name, e.g., "15 augusti 16.55"
