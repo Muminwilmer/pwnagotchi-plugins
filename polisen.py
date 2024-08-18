@@ -24,7 +24,7 @@ class Polisen(plugins.Plugin):
             self.options['epoch-wait'] = 0
         # Only try to update while on wifi
         if 'onlyOnInternet' not in self.options:
-            self.options['onlyOnInternet'] = True
+            self.options['onlyOnInternet'] = False 
         # If true it will show the latest new event. If false it will show latest update/new event
         if 'newestEventTop' not in self.options:
             self.options['newestEventTop'] = True
@@ -142,18 +142,35 @@ class Polisen(plugins.Plugin):
                     latest_time = None
 
                     if self.options['newestEventTop'] == True:
-                        locale.setlocale(locale.LC_TIME, 'sv_SE')
+                        month_translation = {
+                            "januari": "January",
+                            "februari": "February",
+                            "mars": "March",
+                            "april": "April",
+                            "maj": "May",
+                            "juni": "June",
+                            "juli": "July",
+                            "augusti": "August",
+                            "september": "September",
+                            "oktober": "October",
+                            "november": "November",
+                            "december": "December"
+                        }
                         for event in data:
                             # Name example: 15 augusti 16.55, Bråk, Västerås
                             name_str = event.get('name', '')
 
                             # Extracting date from the name, e.g., "15 augusti 16.55"
-                            date_match = re.search(r"([0-9]+ [a-zA-Z]+ [0-9]{2}\.[0-9]{2})", name_str)
+                            date_match = re.search(r"(\S+)", name_str)
+                            day = date_match.group(1)
+                            month = date_match.group(2)
+                            time = date_match.group(3)
+                            month_match
                             if date_match:
-                                date_time = date_match.group(1)
+                                date_time = f"{day} {month_translation.get(month.lower())} {time}"
                                 # Parsing string into a datetime object
                                 event_time = datetime.strptime(date_time, "%d %B %H.%M")
-
+                                logging.info(date_time)
                                 # If latest time is smaller than the event time | make the event time the latest
                                 if latest_time is None or event_time > latest_time:
                                     latest_time = event_time
