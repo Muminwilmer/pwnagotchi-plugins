@@ -38,7 +38,7 @@ class Polisen(plugins.Plugin):
         try:
             self._ui = ui
             # Set default position based on screen type
-            # -4, 98 - Bottom left
+            # -4, 97 - Bottom left
             # 74, 112 - Bottom Row Middle
 
             # Use position set in options.
@@ -46,13 +46,13 @@ class Polisen(plugins.Plugin):
                 position = (self.options["x-position"], self.options["y-position"])
             else:
                 if ui.is_waveshare_v1() or ui.is_waveshare_v2() or ui.is_waveshare_v3():
-                    position = (-4, 98)
+                    position = (-4, 97)
                 elif ui.is_waveshare144lcd():
                     position = (-4, 92)
                 elif ui.is_inky():
                     position = (-4, 83)
                 else:
-                    position = (-4, 98)
+                    position = (-4, 97)
                 self.options['x-position'], self.options['y-position'] = position
 
             # Add the UI element
@@ -105,7 +105,8 @@ class Polisen(plugins.Plugin):
     # Fetch every epoch (depending on your settings)
     def on_epoch(self, agent, epoch, epoch_data):
         try:
-            if (self.options['epoch-wait'] >= self.epochsWaited):
+            logging.info(f"[Polisen] S:{self.options['epoch-wait']} E:{self.epochsWaited}")
+            if (self.options['epoch-wait'] <= self.epochsWaited):
                 logging.info("[Polisen] New epoch!")
                 # Will check if it has internet before starting self.polisen()
                 # If check is turned off for some reason give a warning.
@@ -116,12 +117,10 @@ class Polisen(plugins.Plugin):
                     else:
                         logging.warning("[Polisen] No connection - Skipping epoch")
                 else:
-                    if self.connection:
-                        self.polisen()
-                    else:
+                    if not self.connection:
                         logging.warning("[Polisen] No connection - trying anyways as onlyOnInternet is False!")
+                    self.polisen()
                     self.epochsWaited = 0
-
             else: 
                 logging.info(f"[Polisen] Not yet - {self.options['epoch-wait'] - self.epochsWaited} epochs left before fetching news!")
                 self.epochsWaited += 1
@@ -157,7 +156,7 @@ class Polisen(plugins.Plugin):
                             "december": "December"
                         }
                         for event in data:
-                            # Name example: 15 augusti 16.55, Bråk, Västerås
+                            # Name example: 15 augusti 16.55, Brï¿½k, Vï¿½sterï¿½s
                             name_str = event.get('name', '')
 
                             # Extracting date from the name, e.g., "15 augusti 16.55"
