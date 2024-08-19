@@ -12,7 +12,7 @@ import locale
 
 class Polisen(plugins.Plugin):
     __author__ = '@Muminwilmer'
-    __version__ = '1.2.0'
+    __version__ = '1.2.1'
     __license__ = 'GPL3'
     __description__ = 'Displays the latest event from the Swedish police offical API.'
     
@@ -105,7 +105,6 @@ class Polisen(plugins.Plugin):
     # Fetch every epoch (depending on your settings)
     def on_epoch(self, agent, epoch, epoch_data):
         try:
-            logging.info(f"[Polisen] S:{self.options['epoch-wait']} E:{self.epochsWaited}")
             if (self.options['epoch-wait'] <= self.epochsWaited):
                 logging.info("[Polisen] New epoch!")
                 # Will check if it has internet before starting self.polisen()
