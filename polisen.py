@@ -12,7 +12,7 @@ import locale
 
 class Polisen(plugins.Plugin):
     __author__ = '@Muminwilmer'
-    __version__ = '1.2.1'
+    __version__ = '1.2.0'
     __license__ = 'GPL3'
     __description__ = 'Displays the latest event from the Swedish police offical API.'
     
@@ -52,7 +52,7 @@ class Polisen(plugins.Plugin):
                 elif ui.is_inky():
                     position = (-4, 83)
                 else:
-                    position = (-4, 97)
+                    position = (-4, 92)
                 self.options['x-position'], self.options['y-position'] = position
 
             # Add the UI element
@@ -97,7 +97,7 @@ class Polisen(plugins.Plugin):
                 ui.set('face', "(^-^)")
                 logging.info("[Polisen] ui has been updated!")
                 self.news = ""
-            elif not self.connection and self.options['onlyOnInternet']:
+            elif not self.connection and self.options['onlyOnInternet'] and ui.get('polisen-ui') == '':
                 ui.set('polisen-ui', "No wifi")
         except Exception as e:
             logging.error(f"[Polisen] Failed to update UI: {e}")
@@ -105,6 +105,7 @@ class Polisen(plugins.Plugin):
     # Fetch every epoch (depending on your settings)
     def on_epoch(self, agent, epoch, epoch_data):
         try:
+            logging.info(f"[Polisen] S:{self.options['epoch-wait']} E:{self.epochsWaited}")
             if (self.options['epoch-wait'] <= self.epochsWaited):
                 logging.info("[Polisen] New epoch!")
                 # Will check if it has internet before starting self.polisen()
@@ -176,7 +177,19 @@ class Polisen(plugins.Plugin):
                         location = latest_event.get('location', {}).get('name', 'Unknown')
                         event_type = latest_event.get('type', 'Unknown')
                         event_time_str = re.search(r"([0-9]+.[0-9]+)", latest_event.get('name', 'Unknown')).group(1)
-                        self.news = f"{event_type[slice(12)]} - {location[slice(15)]} ({event_time_str})"
+                        location_split = location.split()
+                        location = max(location_split, key=len)
+
+
+                        processed_words = []
+                        for word in location_split:
+                            if word == location:
+                                processed_words.append(word[:15][:len(word)-1])
+                            else:
+                                if "län" not in word: 
+                                    processed_words.append(word[0])
+                        result = ' '.join(processed_words)
+                        self.news = f"{event_type[slice(12)]} - {result} ({event_time_str})"
                         logging.info(f"[Polisen] Fetched news: {self.news}")
         except requests.RequestException as e:
             logging.error(f"[Polisen] Data fetch failed: {e}")
