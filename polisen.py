@@ -166,47 +166,47 @@ class Polisen(plugins.Plugin):
             logging.error(f"[Polisen] Start during epoch failed: {e}")
 
     # Fetches the latest event from the Swedish police official api
-def polisen(self):
-    try:
-        logging.info(f"[Polisen] Fetching news!")
-        response = requests.get("https://polisen.se/api/events", timeout=10)
-        response.raise_for_status()
-
-        if response.status_code == 200:
-            data = response.json()
-            if data:
-                latest_event = data[0]
-
-                if self.options['newestEventTop']:
-                    latest_event = max(
-                        data,
-                        key=lambda event: datetime.strptime(
-                            re.search(r"(\S+) (\S+) (\d+\.\d+)", event.get('name', '')).group(0),
-                            f"%d %B %H.%M"
+    def polisen(self):
+        try:
+            logging.info(f"[Polisen] Fetching news!")
+            response = requests.get("https://polisen.se/api/events", timeout=10)
+            response.raise_for_status()
+    
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    latest_event = data[0]
+    
+                    if self.options['newestEventTop']:
+                        latest_event = max(
+                            data,
+                            key=lambda event: datetime.strptime(
+                                re.search(r"(\S+) (\S+) (\d+\.\d+)", event.get('name', '')).group(0),
+                                f"%d %B %H.%M"
+                            )
                         )
-                    )
-
-                if latest_event:
-                    location = latest_event.get('location', {}).get('name', 'Unknown')
-                    event_type = latest_event.get('type', 'Unknown')
-                    event_time_str = re.search(r"([0-9]+.[0-9]+)", latest_event.get('name', 'Unknown')).group(1)
-
-                    if not self.options['twoUi']:
-                        location_split = location.split()
-                        location = max(location_split, key=len)
-                        processed_words = [
-                            word[:15] if word == location else word[0]
-                            for word in location_split if "län" not in word
-                        ]
-                        result = ' '.join(processed_words)
-                        self.city = event_type
-                        self.event = f"{result} ({event_time_str})"
-                    else:
-                        self.city = event_type
-                        self.event = f"{location} ({event_time_str})"
-
-                    logging.info("[Polisen] Fetched news")
-    except requests.RequestException as e:
-        logging.error(f"[Polisen] Data fetch failed: {e}")
-    except Exception as e:
-        logging.error(f"[Polisen] Data parsing failed: {e}")
+    
+                    if latest_event:
+                        location = latest_event.get('location', {}).get('name', 'Unknown')
+                        event_type = latest_event.get('type', 'Unknown')
+                        event_time_str = re.search(r"([0-9]+.[0-9]+)", latest_event.get('name', 'Unknown')).group(1)
+    
+                        if not self.options['twoUi']:
+                            location_split = location.split()
+                            location = max(location_split, key=len)
+                            processed_words = [
+                                word[:15] if word == location else word[0]
+                                for word in location_split if "län" not in word
+                            ]
+                            result = ' '.join(processed_words)
+                            self.city = event_type
+                            self.event = f"{result} ({event_time_str})"
+                        else:
+                            self.city = event_type
+                            self.event = f"{location} ({event_time_str})"
+    
+                        logging.info("[Polisen] Fetched news")
+        except requests.RequestException as e:
+            logging.error(f"[Polisen] Data fetch failed: {e}")
+        except Exception as e:
+            logging.error(f"[Polisen] Data parsing failed: {e}")
